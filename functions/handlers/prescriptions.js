@@ -25,7 +25,6 @@ exports.getAllPrescriptions = (req, res) => {
 
 exports.postPrescription = (req, res) => {
     const medications = req.body.medications;
-    const restrictions = req.body.warnings;
 
     const newPrescription = {
         clinic: req.body.clinic,
