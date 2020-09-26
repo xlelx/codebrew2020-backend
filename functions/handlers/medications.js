@@ -1,11 +1,9 @@
-const Medications = {};
 const { db } = require('../util/admin');
+const medicationsRef = db.collection('medications');
 
-getAllMedications = (req, res) => {
-    followUpsRef
-        .where('patientId', '==', req.params.patientId)
-        // does this put latest-prescribed medication first?
-        .orderBy('createdAt', 'desc')
+exports.getAllMedications = (req, res) => {
+    medicationsRef
+        .where('patientId', '==', req.user.id)
         .get()
         .then(data => {
             let medications = [];
@@ -22,26 +20,3 @@ getAllMedications = (req, res) => {
             return res.status(500).json({ error: err.code });
         })
 }
-
-getMedication = (req, res) => {
-    let followUpData = {}
-    followUpsRef
-        .where('patientId', '==', req.params.patientId)
-        .where('followupId', '==', req.params.followUpId)
-        .get()
-        .then((doc) => {
-            if (!doc.exists) {
-                return res.status(404).json({ error: 'FollowUp Appointment not foound' });
-            }
-            followUpData = doc.data();
-            followUpData.followUpId = doc.id();
-            return res.json(followUpData);
-        })
-        .catch((err) => {
-            console.error(err);
-            return res.status(500).json({ error: err.code });
-        })
-}
-
-
-export default Medications;

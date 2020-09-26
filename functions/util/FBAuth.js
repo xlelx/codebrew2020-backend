@@ -23,6 +23,7 @@ function FBAuth(req, res, next){
     })
     .then(data => {
         req.user.email = data.docs[0].data().email;
+        req.user.id = data.docs[0].data().userId;
         return next();
     })
     .catch(err => {
