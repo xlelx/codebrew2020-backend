@@ -42,35 +42,35 @@ exports.getAllRestrictions = (req, res) => {
         })
 }
 
-exports.postMedication = (medication, prescriptionId, patientId) => {
+// exports.postMedication = (medication, prescriptionId, patientId) => {
 
-    const newMedication = {
-        patientId: patientId,
-        name: medication.medicationName,
-        prescriptionId: prescriptionId,
-        startDate: medication.startDate,
-        endDate: medication.endDate,
-        restrictions: medication.restrictions,
-        instructions: medication.instructions
-    }
+//     const newMedication = {
+//         patientId: patientId,
+//         name: medication.medicationName,
+//         prescriptionId: prescriptionId,
+//         startDate: medication.startDate,
+//         endDate: medication.endDate,
+//         restrictions: medication.restrictions,
+//         instructions: medication.instructions
+//     }
 
-    // diagnosis should not be empty 
-    if (newMedication.body.name.trim() === '') {
-        res.status(400).json({body: "Should not be empty!"});
-    }
+//     // diagnosis should not be empty 
+//     if (newMedication.body.name.trim() === '') {
+//         res.status(400).json({body: "Should not be empty!"});
+//     }
 
-    // if medication name is not empty, create a new prescription document in firestore
-    else {
-        medicationsRef
-        .add(newMedication)
-        .then(doc => {
-            const resMedication = newMedication;
-            resMedication.medicationId = doc.id;
-            res.json(resMedication);
-        })
-        .catch(err => {
-            res.status(500).json({ error: 'something went wrong' });
-        })
-    }
+//     // if medication name is not empty, create a new prescription document in firestore
+//     else {
+//         medicationsRef
+//         .add(newMedication)
+//         .then(doc => {
+//             const resMedication = newMedication;
+//             resMedication.medicationId = doc.id;
+//             res.json(resMedication);
+//         })
+//         .catch(err => {
+//             res.status(500).json({ error: 'something went wrong' });
+//         })
+//     }
 
-}
+// }

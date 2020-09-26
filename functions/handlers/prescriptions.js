@@ -23,13 +23,13 @@ exports.getAllPrescriptions = (req, res) => {
         })
 }
 
-exports.postPrescription = (req, res) => {
-    const medications = req.body.medications;
+exports.postPrescription = async (req, res) => {
+    const medications = [...req.body.medications];
 
     const newPrescription = {
         clinic: req.body.clinic,
-        dateExpire: req.body.prescriptionEndDate,
-        dateGenerated: req.body.prescriptionStartDate,
+        dateExpire: new Date().toISOString(),
+        dateGenerated: new Date().toISOString(),
         patientFirstname: req.body.patientFirstName,
         patientLastName: req.body.patientLastName,
         patientId: req.body.patientId,
@@ -38,36 +38,93 @@ exports.postPrescription = (req, res) => {
     }
 
     // diagnosis should not be empty 
-    if (newPrescription.body.diagnosis.trim() === '') {
-        res.status(400).json({body: "Should not be empty!"});
+    if (newPrescription.diagnosis.trim() === '') {
+        return res.status(400).json({body: "Should not be empty!"});
     }
 
-    // if diagnosis is not empty, create a new prescription document in firestore
-    else {
-        prescriptionsRef
-        .add(newPrescription)
-        .then(doc => {
-            const resPrescription = newPrescription;
-            resPrescription.prescriptionId = doc.id;
+    try {
+        const prescriptionDoc = await prescriptionsRef.add(newPrescription);
 
-            // ADD THE MEDICATIONS FROM THIS PRESCRIPTION TO DATABASE
-            for (var i=0; i<medications.length; i++) {
-                postMedication(medication, resPrescription.prescriptionId, req.body.patientId);
+        await medications.forEach(async medication => {
+            const newMedication = {
+                patientId: req.body.patientId,
+                name: medication.medicationName,
+                prescriptionId: prescriptionDoc.id,
+                startDate: medication.startDate,
+                endDate: medication.endDate,
+                restrictions: medication.restrictions,
+                instructions: medication.instructions
             }
 
-            // ADD THE WARNING FROM THIS PRESCRIPTION TO DATABASE if any
-            
-            
-            
-            res.json(resPrescription);
-            
+            try {
+                // add to medication
+            const medicationDoc = await db.collection('medications').add(newMedication);
+            console.log(medicationDoc.data());
+            }
+            catch (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'something went wrong again'});
+            }
         })
-        .catch(err => {
-            res.status(500).json({ error: 'something went wrong' });
-        })
+        return res.status(200).json(newPrescription);
     }
-
+    catch(err) {
+        console.error(err);
+        return res.status(500).json({ error: 'something went wrong' });
+    }
 }
+
+    
+
+    // // if diagnosis is not empty, create a new prescription document in firestore
+    // else {
+    //     prescriptionsRef
+    //     .add(newPrescription)
+    //     .then(doc => {
+    //         const resPrescription = newPrescription;
+    //         resPrescription.prescriptionId = doc.id;
+
+    //         // medications.forEach(element => {
+    //         //     const newMedication = {
+    //         //         patientId: patientId,
+    //         //         name: medication.medicationName,
+    //         //         prescriptionId: prescriptionId,
+    //         //         startDate: medication.startDate,
+    //         //         endDate: medication.endDate,
+    //         //         restrictions: medication.restrictions,
+    //         //         instructions: medication.instructions
+    //         //     }
+            
+    //         //     // diagnosis should not be empty 
+    //         //     if (newMedication.body.name.trim() === '') {
+    //         //         return res.status(400).json({body: "Should not be empty!"});
+    //         //     }
+            
+    //         //     // if medication name is not empty, create a new prescription document in firestore
+                
+    //         //     medicationsRef
+    //         //     .add(newMedication)
+    //         //     .then(doc => {
+    //         //         const resMedication = newMedication;
+    //         //         resMedication.medicationId = doc.id;
+    //         //         res.json(resMedication);
+    //         //     })
+    //         //     .catch(err => {
+    //         //         res.status(500).json({ error: 'something went wrong' });
+    //         //     })
+                
+                
+    //         // });
+            
+        
+    //         res.json(resPrescription);
+            
+    //     })
+    //     .catch(err => {
+    //         res.status(500).json({ error: 'something went wrong' });
+    //     })
+    // }
+
 
 
 

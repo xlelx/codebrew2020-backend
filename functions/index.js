@@ -3,9 +3,8 @@ const cors = require('cors');
 const { signup, login } = require('./handlers/auth.js')
 const { FBAuth } = require('./util/FBAuth');
 const { getAllFollowUps } = require('./handlers/followups');
-const { getAllMedications,postMedication } = require('./handlers/medications');
+const { getAllMedications } = require('./handlers/medications');
 const { getAllMedicationSchedules } = require('./handlers/medicationSchedules');
-const { getAllRestrictions } = require('./handlers/restrictions');
 const { getAllFaqs } = require('./handlers/faqs');
 const { getAllPrescriptions, postPrescription } = require('./handlers/prescriptions');
 
@@ -27,12 +26,10 @@ app.use(cors());
 
 app.post('/login', login);
 app.post('/signup', signup);
-app.post('/medication', postMedication);
 app.post('/prescription', postPrescription);
 app.get('/allfaqs', FBAuth, getAllFaqs);
 app.get('/allmedications', FBAuth, getAllMedications);
 app.get('/allprescriptions', FBAuth, getAllPrescriptions);
-app.get('/allrestrictions', FBAuth, getAllRestrictions);
 app.get('/allmedicationschedules', FBAuth, getAllMedicationSchedules);
 app.get('/allfollowups', FBAuth, getAllFollowUps);
 
